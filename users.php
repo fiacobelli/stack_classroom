@@ -4,7 +4,7 @@ $site=$_GET["site"];
 if (!isset($site))
    $site="stackoverflow";
 $ch = curl_init();
-$url = "https://api.stackexchange.com/2.0/users/".$users."/questions?order=desc&sort=activity&site=".$site;
+$url = "https://api.stackexchange.com/2.2/users/".$users."/questions?order=desc&sort=activity&site=".$site;
 #echo $url;
 curl_setopt($ch,CURLOPT_URL, $url);
 curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);

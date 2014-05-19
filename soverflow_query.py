@@ -9,6 +9,7 @@ import urllib2,urllib
 import time
 import zlib
 import pprint
+import argparse
 
 base_url = 'http://api.stackexchange.com/2.2'
 
@@ -34,11 +35,11 @@ def requestAllReputationPages(uids,from_dt,to_dt,site,page_size):
     while (more):
         page=page+1
         reputation="%s/users/%s/reputation-history?fromdate=%s&todate=%s&site=%s&pagesize=%s&page=%s"%(base_url,uids,from_dt,to_dt,site,page_size,page)
-        print reputation
+        #print reputation
         jRep = requestStackOverflowData(reputation)
         more = jRep["has_more"]
         items["items"].extend(jRep["items"])
-    print "Number of pages:",page
+    #print "Number of pages:",page
     return items
         
     
@@ -52,7 +53,7 @@ def summary(uids,from_dt,to_dt,site="stackoverflow",page_size="100"):
 def summarize(aResp):
     items = aResp["items"]
     summ = {}
-    pprint.pprint(aResp)
+    #pprint.pprint(aResp)
     for item in items:
         if item.has_key("reputation_change"):
             user_id = item["user_id"]
@@ -66,9 +67,9 @@ def summarize(aResp):
     return summ
 
 def addUsers(jRepSum,jUsers):
-    pprint.pprint(jRepSum)
+    #pprint.pprint(jRepSum)
     for user in jUsers["items"]:
-        print user["user_id"],user["display_name"]
+        #print user["user_id"],user["display_name"]
         if jRepSum.has_key(user["user_id"]):
             jRepSum[user["user_id"]]["display_name"]=user["display_name"]
         else:
@@ -78,16 +79,46 @@ def addUsers(jRepSum,jUsers):
  
 def date2epoch(dt,dt_format="%m.%d.%Y %H:%M:%S"):
     return int(time.mktime(time.strptime(dt,dt_format)))
+
+
+def summary2Csv(jSummary,sep=","):
+    result = "user_id,display_name,asker_accepts_answer,asker_unaccept_answer,post_downvoted,post_undownvoted,post_upvoted,post_unupvoted,reputation_change\n"
+    result = result.replace(",",sep)
+    for uid,stats in jSummary.iteritems():
+        result += str(uid)+sep+stats["display_name"]+sep
+        result += getStrField(stats,"asker_accepts_answer")+sep+getStrField(stats,"asker_unaccept_answer")+sep
+        result += getStrField(stats,"post_downvoted")+sep+getStrField(stats,"post_undownvoted")+sep
+        result += getStrField(stats,"post_upvoted")+sep+getStrField(stats,"post_unupvoted")+sep
+        result += getStrField(stats,"reputation_change")+"\n"
+    return result
+        
+ 
+def getStrField(aDic,key):
+    return str(aDic.get(key,0))
     
-    
+
+parser = argparse.ArgumentParser()
+parser.add_argument("uids",help="Type all the relevant user ids within quotes and separated by semicolon")
+parser.add_argument("from_dt",help="Type the from-date in the format DD.MM.YYYY hh:mm:ss within quotes")
+parser.add_argument("to_dt",help="Type the to-date in the format DD.MM.YYYY hh:mm:ss within quotes")
+parser.add_argument("-s","--site",help="The name of the stackexchange site. Default:stackoverflow")
+args = parser.parse_args()
+
 if __name__=='__main__':
-    from_t=date2epoch("07.01.2013 00:00:00")
-    to_t = date2epoch("08.01.2013 00:00:00")
+    #from_t=date2epoch("07.01.2013 00:00:00")
+    #to_t = date2epoch("08.01.2013 00:00:00")
+    from_t = date2epoch(args.from_dt)
+    to_t = date2epoch(args.to_dt)
+    ids = args.uids
+    site = "stackoverflow"
+    if args.site:
+        site = args.site
+    print (summary2Csv(summary(ids,from_t,to_t,site)))
     #print "CS347-S2014"
     #pprint.pprint( summary("1634666;1956256;1955944;3192092;2229847;3191522;3191650;2727084;3187763;2403309;3192094;1900408;2403302;3188062;3171412",from_t,to_t))
    
-    print "CS207-2013"
-    pprint.pprint(summary( "2403300;2403298;2403294;2403299;2403296;2403310;2403293;2403305;2403313;2403297;2403312;2403307;2403295;1985730;2403308;2403316;2403302;2403309;2403314;2079015;2403304;2403325;2406921;2407065;2585182",from_t,to_t))
+    #print "CS207-2013"
+    #print summary2Csv(summary( "2403300;2403298;2403294;2403299;2403296;2403310;2403293;2403305;2403313;2403297;2403312;2403307;2403295;1985730;2403308;2403316;2403302;2403309;2403314;2079015;2403304;2403325;2406921;2407065;2585182",from_t,to_t))
    
     #print "CS207-Fall2012"
     #pprint.pprint(summary( "1631924;1629467;1634633;1634784;1634924;1634171;1633922;1637079;1647102;1732565",from_t,to_t))
