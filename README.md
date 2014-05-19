@@ -18,4 +18,6 @@ How to use
  b. To see the reputation change by quarter and total reputation of your users, the drill is the same, but instead of users.php, you type reps.php. In our example: http://cs.neiu.edu/~fiacobelli/so2/reps.php?uids=5192;4240;6777;6093&site=philosphy
  
  c. To see a summary of student's activity within a given period of time, you go to: http://cs.neiu.edu/~fiacobelli/so2/soverflow_query_stats.php?uids=5192;4240;6777;6093&site=philosophy&from=05.01.2014+00:00:00&to=05.20.2014+00:00:00
-In this last case you specify a "from" and a "to" date in the format MM.DD.YYY+hh:mm:ss (that is the month number, the day, the year (separated by a dot), a PLUS sign, the hours, minutes and seconds (separated by colon).
+In this last case you specify a "from" and a "to" date in the format MM.DD.YYY+hh:mm:ss (that is the month number, the day, the year (separated by a dot), a PLUS sign, the hours, minutes and seconds (separated by colon). In the example above, the data is from 5/01/2014 at midnight to 5/20/2014 at midnight.
+
+*If you install these scripts on your own web server, replace the cs.neiu.edu/~fiacobelli/so appropriately (you webmaster should be able to tell you)
