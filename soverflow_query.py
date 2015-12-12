@@ -28,6 +28,11 @@ def requestUsersData(uids,site):
     return requestStackOverflowData(users)
     
 
+def requestPostData(uids,site,from_dt,to_dt):
+    post_data = "%s/users/%s/posts?fromdate=%s&todate=%s&order=desc&sort=activity&site=%s"%(base_url,uids,from_dt,to_dt,site)
+    return requestStackOverflowData(post_data)
+
+
 def requestAllReputationPages(uids,from_dt,to_dt,site,page_size):
     more = True
     page=0
@@ -47,12 +52,12 @@ def requestAllReputationPages(uids,from_dt,to_dt,site,page_size):
 def summary(uids,from_dt,to_dt,site="stackoverflow",page_size="100"):
     jRep = requestAllReputationPages(uids,from_dt,to_dt,site,page_size)
     jUsers = requestUsersData(uids,site)
-    return addUsers(summarize(jRep),jUsers)
+    jActivity = requestPostData(uids,site,from_dt,to_dt)
+    return addUsers(summarize(jActivity,summarize(jRep)),jUsers)
     
  
-def summarize(aResp):
+def summarize(aResp,summ={}):
     items = aResp["items"]
-    summ = {}
     #pprint.pprint(aResp)
     for item in items:
         if item.has_key("reputation_change"):
@@ -64,6 +69,13 @@ def summarize(aResp):
                 summ[user_id][post_type] = summ[user_id].get(post_type,0)+1
             else:
                 summ[user_id]={"reputation_change":reputation_change,post_type:1}
+        elif item.has_key("post_type"):
+            user_id = item["owner"]["user_id"]
+            post_type = item["post_type"]
+            if summ.has_key(user_id):
+                summ[user_id][post_type] =   summ[user_id].get(post_type,0)+1
+            else:
+                summ[user_id]={"reputation_change":0,post_type:1}
     return summ
 
 def addUsers(jRepSum,jUsers):
@@ -82,14 +94,15 @@ def date2epoch(dt,dt_format="%m.%d.%Y %H:%M:%S"):
 
 
 def summary2Csv(jSummary,sep=","):
-    result = "user_id,display_name,asker_accepts_answer,asker_unaccept_answer,post_downvoted,post_undownvoted,post_upvoted,post_unupvoted,reputation_change\n"
+    result = "user_id,display_name,asker_accepts_answer,asker_unaccept_answer,post_downvoted,post_undownvoted,post_upvoted,post_unupvoted,reputation_change,questions,answers\n"
     result = result.replace(",",sep)
+    print jSummary
     for uid,stats in jSummary.iteritems():
         result += str(uid)+sep+stats["display_name"]+sep
         result += getStrField(stats,"asker_accepts_answer")+sep+getStrField(stats,"asker_unaccept_answer")+sep
         result += getStrField(stats,"post_downvoted")+sep+getStrField(stats,"post_undownvoted")+sep
         result += getStrField(stats,"post_upvoted")+sep+getStrField(stats,"post_unupvoted")+sep
-        result += getStrField(stats,"reputation_change")+"\n"
+        result += getStrField(stats,"reputation_change")+sep+getStrField(stats,"question")+sep+getStrField(stats,"answer")+"\n"
     return result
         
  
@@ -116,14 +129,10 @@ if __name__=='__main__':
     print (summary2Csv(summary(ids,from_t,to_t,site)))
     #print "CS347-S2014"
     #pprint.pprint( summary("1634666;1956256;1955944;3192092;2229847;3191522;3191650;2727084;3187763;2403309;3192094;1900408;2403302;3188062;3171412",from_t,to_t))
+
+    # Sample run.
+    # python soverflow_query.py "1634666;1956256;1955944;3192092;3558133" "12.01.2015 00:00:00" "12.05.2015 00:00:00"
    
-    #print "CS207-2013"
-    #print summary2Csv(summary( "2403300;2403298;2403294;2403299;2403296;2403310;2403293;2403305;2403313;2403297;2403312;2403307;2403295;1985730;2403308;2403316;2403302;2403309;2403314;2079015;2403304;2403325;2406921;2407065;2585182",from_t,to_t))
-   
-    #print "CS207-Fall2012"
-    #pprint.pprint(summary( "1631924;1629467;1634633;1634784;1634924;1634171;1633922;1637079;1647102;1732565",from_t,to_t))
-   
-   #print "CS207-Fall2012"
-   #pprint.pprint(summary( "1956258;1956259;1956255;1956246;1956271;1234775;1956256;1956276;1956264;1956254;1956250;1956252;1956253;1956267;1956245;1956269;1956273;1956298;2172562",from_t,to_t))
+    
    
    
