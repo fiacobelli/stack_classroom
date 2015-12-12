@@ -96,7 +96,7 @@ def date2epoch(dt,dt_format="%m.%d.%Y %H:%M:%S"):
 def summary2Csv(jSummary,sep=","):
     result = "user_id,display_name,asker_accepts_answer,asker_unaccept_answer,post_downvoted,post_undownvoted,post_upvoted,post_unupvoted,reputation_change,questions,answers\n"
     result = result.replace(",",sep)
-    print jSummary
+    #print jSummary
     for uid,stats in jSummary.iteritems():
         result += str(uid)+sep+stats["display_name"]+sep
         result += getStrField(stats,"asker_accepts_answer")+sep+getStrField(stats,"asker_unaccept_answer")+sep
