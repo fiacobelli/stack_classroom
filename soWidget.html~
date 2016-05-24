@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>StackOverflow Widget</title>
+    <javascript>
+      function generateLinks(){
+      ids=document.findElementById("ids").value
+      alert(ids);
+      
+      }
+    </javascript>
+  </head>
+  <body>
+    <p>Please type in the Stack OVerflow IDs of your classroom. </p>
+    <div>
+      <form action="#" method="GET">
+	Enter the IDs:<br/>
+	<textarea id="ids" rows=30 cols=40 />
+	<button id="generate" value="Generate" onClick="generateLinks();"/>
+      </form>
+    </div>
+    <div id="link">
+    </div>
+  </body>
+</html>

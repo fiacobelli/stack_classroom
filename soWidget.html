@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <title>StackOverflow Widget</title>
+      <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script language="javascript">
+      $(function() {
+      $( "#from" ).datepicker();
+      $("#to").datepicker();
+  });
+      function generateLinks(){
+      ids=document.getElementById("ids").value.replace(/\n/g,";")
+      if (ids.charAt(ids.length-1)==';')
+          ids = ids.substring(0,ids.length-1)
+      link = document.getElementById("link");
+      baseLink = "http://cs.neiu.edu/~fiacobelli/so2/soverflow_query_stats.php?uids="
+      d1 = document.getElementById("from").value.replace(/\//g,".")
+      d2 = document.getElementById("to").value.replace(/\//g,".")
+      dates = "&from="+d1+"+00:00:00&to="+d2+"+00:00:00"
+      link.innerHTML = "<a href='"+baseLink+ids+dates+"'>"+baseLink+ids+dates+"</a>";
+      document.getElementById("msg").setStyle="display:block;"
+      }
+
+      function formatDate(dt){
+      return ""+ (dt.getUTCMonth()+1)+"/"+(dt.getUTCDate()+1)+"/"+dt.getFullYear();
+      }
+    </script>
+  </head>
+  <body>
+    <p>Please type in the Stack OVerflow IDs of your classroom. </p>
+    <div>
+      <form action="#" method="GET">
+	Enter the IDs:<br/>
+	<textarea id="ids" rows=10 cols=30></textarea><br/>
+	From:<input id="from" type="date" /> to <input id="to" type="date"/><br/>
+	<button id="generate" value="Generate" onClick="generateLinks();">Generate</button>
+      </form>
+    </div>
+    <div id="msg" style="display:none;">
+      Please copy the following link and share it with your students or your LMS
+    </div>
+    <div id="link">
+    </div>
+  </body>
+  <script language="javascript">
+    var today = new Date()
+    var enddt = new Date()
+    enddt.setDate(today.getDate()+90)
+    document.getElementById("from").value=formatDate(today);
+    document.getElementById("to").value=formatDate(enddt);
+  </script>
+</html>
